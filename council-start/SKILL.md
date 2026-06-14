@@ -29,6 +29,9 @@ Before doing anything else, silently check:
 # Check for CONTEXT.md
 ls CONTEXT.md CONTEXT-MAP.md 2>/dev/null
 
+# Check for SECURITY.md
+ls SECURITY.md 2>/dev/null
+
 # Check for ADRs
 ls docs/adr/ 2>/dev/null
 
@@ -37,6 +40,10 @@ grep -l "Agent skills" CLAUDE.md AGENTS.md 2>/dev/null
 
 # Check for existing PRDs / issues
 ls .scratch/ docs/prd/ 2>/dev/null
+
+# Detect Microsoft stack (for auto-triggering msft-security)
+cat package.json 2>/dev/null | grep -i "spfx\|@microsoft\|@pnp\|sharepoint\|graph" | head -5
+find . -name "package-solution.json" -o -name "*.csproj" 2>/dev/null | head -3
 ```
 
 **Decision tree based on findings:**
@@ -44,13 +51,15 @@ ls .scratch/ docs/prd/ 2>/dev/null
 | State | Action |
 |-------|--------|
 | No `CONTEXT.md` AND no agent skills config | → Auto-run `/setup-ashraf-skills` before anything else. Tell user: *"No project context found — setting up your repo first. This only happens once."* |
+| `CONTEXT.md` exists but no `SECURITY.md` | → Auto-run `/setup-ashraf-skills` security baseline section only. Tell user: *"No security baseline found — creating SECURITY.md. Takes 2 minutes."* |
 | `CONTEXT.md` exists but no agent skills config | → Auto-run `/setup-ashraf-skills` in quick mode (issue tracker + labels only, reuse existing CONTEXT.md) |
 | Everything exists | → Skip setup, proceed to Phase 1 |
 
 After setup completes (or if already set up), read:
 1. `CONTEXT.md` — load the domain glossary into context
-2. `docs/adr/*.md` — load architectural decisions
-3. Any existing PRDs or issues — detect pipeline position
+2. `SECURITY.md` — load security baseline, data classification, accepted risks, auth provider
+3. `docs/adr/*.md` — load architectural decisions
+4. Any existing PRDs or issues — detect pipeline position
 
 **Never tell the user you're doing this check.** Just do it and move on.
 
@@ -136,24 +145,54 @@ Then: red → green → refactor. One test at a time. Vertical slices only.
 
 ---
 
-## Stage 4 — Review (`/code-council`)
+## Stage 4 — Review (`/code-council` + security layer)
 
+### 4a — Code Council
 Run the full Code Council. See `code-council/SKILL.md` for the complete protocol.
 
 Quick summary of what happens:
 1. Present depth menu (Quick / Standard / Deep) — default Standard
-2. Run context capture (reads CONTEXT.md + ADRs, classifies files)
+2. Run context capture (reads CONTEXT.md + SECURITY.md + ADRs, classifies files)
 3. Run all 6 reviewers using domain vocabulary from CONTEXT.md
 4. Run conflict check
 5. Produce verdict: SHIP IT / SHIP WITH FIXES / DO NOT SHIP
 
-**Auto-advance logic:**
+### 4b — Security layer (auto-triggered when relevant)
 
-| Verdict | Action |
-|---------|--------|
-| SHIP IT | Tell user: *"Council cleared. You're good to ship."* → done |
-| SHIP WITH FIXES | Offer to fix Highs. If user says yes → fix files directly in repo → re-run delta review → loop |
-| DO NOT SHIP | List Blockers → auto-advance to Stage 5 for each Blocker |
+After the Code Council runs, check whether changed files touch security-sensitive areas:
+
+```bash
+# Check if changed files touch auth, APIs, data, or external integrations
+git diff --name-only HEAD 2>/dev/null | grep -iE \
+  "auth|login|session|token|oauth|jwt|password|credential|\
+   api|route|endpoint|controller|handler|\
+   database|db|query|repository|model|service|\
+   secret|key|config|env"
+```
+
+**Auto-trigger rules:**
+
+| Condition | Action |
+|-----------|--------|
+| Changed files touch auth / session / tokens | → Auto-run `/security-council` (Auth + Secrets agents) |
+| Changed files touch API routes / controllers | → Auto-run `/security-council` (API Surface agent) |
+| Changed files touch DB / queries / models | → Auto-run `/security-council` (Data Access agent) |
+| Any of the above + Microsoft stack detected | → Also auto-run `/msft-security` |
+| Before every SHIP IT verdict | → Always auto-run `/secrets-scan` |
+| User explicitly asks for security review | → Run full `/security-council` (all 5 agents) |
+
+Tell the user when security layer is triggered:
+> *"Changed files touch [auth/API/data] — running Security Council before clearing for ship."*
+
+### 4c — Verdict logic (combined)
+
+| Code Council | Security Council | Final verdict |
+|-------------|-----------------|---------------|
+| SHIP IT | SECURE | ✅ SHIP IT |
+| SHIP IT | HARDEN BEFORE SHIP | ⚠️ SHIP WITH SECURITY FIXES |
+| SHIP IT | DO NOT SHIP | 🔴 DO NOT SHIP |
+| SHIP WITH FIXES | Any | ⚠️ SHIP WITH FIXES (resolve all) |
+| DO NOT SHIP | Any | 🔴 DO NOT SHIP (blockers first) |
 
 ---
 

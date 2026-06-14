@@ -27,6 +27,9 @@ Before anything else:
 # Load domain vocabulary
 cat CONTEXT.md 2>/dev/null || cat CONTEXT-MAP.md 2>/dev/null
 
+# Load security baseline
+cat SECURITY.md 2>/dev/null
+
 # Load architectural decisions
 ls docs/adr/*.md 2>/dev/null && cat docs/adr/*.md
 
@@ -36,7 +39,16 @@ cat requirements.txt pyproject.toml 2>/dev/null | head -10
 cat *.csproj 2>/dev/null | head -10
 ```
 
-Use domain vocabulary from `CONTEXT.md` in every reviewer finding. "The `Customer` entity" not "the user object". If no `CONTEXT.md` exists, tell the orchestrator — do not proceed without it (the orchestrator will run `/setup-ashraf-skills`).
+Use domain vocabulary from `CONTEXT.md` in every reviewer finding. "The `Customer` entity" not "the user object".
+
+Load from `SECURITY.md`:
+- Data classification → pass to Security Auditor to calibrate severity
+- Auth provider → helps Correctness Judge flag auth-related logic errors
+- Accepted risks → Security Auditor skips or downgrades these findings
+- Known public endpoints → Integration Skeptic won't flag these as unprotected
+
+If no `CONTEXT.md` exists, tell the orchestrator — do not proceed without it (the orchestrator will run `/setup-ashraf-skills`).
+If no `SECURITY.md` exists, note it and continue — Security Auditor will flag at default severity without accepted-risk filtering.
 
 ---
 

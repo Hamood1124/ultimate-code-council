@@ -11,6 +11,7 @@ Scaffold the per-repo configuration that the engineering skills assume:
 - **Issue tracker** — where issues live (GitHub by default; local markdown is also supported out of the box)
 - **Triage labels** — the strings used for the five canonical triage roles
 - **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Security baseline** — `SECURITY.md` read by all council and security skills
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -23,9 +24,11 @@ Look at the current repo to understand its starting state. Read whatever exists;
 - `git remote -v` and `.git/config` — is this a GitHub repo? Which one?
 - `AGENTS.md` and `CLAUDE.md` at the repo root — does either exist? Is there already an `## Agent skills` section in either?
 - `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root
+- `SECURITY.md` at the repo root — does a security baseline already exist?
 - `docs/adr/` and any `src/*/docs/adr/` directories
 - `docs/agents/` — does this skill's prior output already exist?
 - `.scratch/` — sign that a local-markdown issue tracker convention is already in use
+- `package.json`, `*.csproj`, `requirements.txt` — detect stack for SECURITY.md pre-fill
 
 ### 2. Present findings and ask
 
@@ -104,6 +107,10 @@ The block:
 ### Domain docs
 
 [one-line summary of layout — "single-context" or "multi-context"]. See `docs/agents/domain.md`.
+
+### Security baseline
+
+SECURITY.md exists at repo root. Read by all council and security skills for data classification, auth provider, accepted risks, and known public endpoints.
 ```
 
 Then write the three docs files using the seed templates in this skill folder as a starting point:
@@ -116,6 +123,24 @@ Then write the three docs files using the seed templates in this skill folder as
 
 For "other" issue trackers, write `docs/agents/issue-tracker.md` from scratch using the user's description.
 
-### 5. Done
+### 5. Create SECURITY.md
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+If `SECURITY.md` does not already exist, create it by asking the user **Section D** — one section at a time:
+
+> Explainer: `SECURITY.md` is read by all council and security skills. It tells them how your project handles authentication, what data it processes, and what risks have already been reviewed and accepted. This prevents false positives and calibrates issue severity correctly.
+
+Ask these questions one at a time:
+
+1. **Data classification:** Is this project internal only (ACME team), client-facing (your client accesses it), or public internet (anyone can reach it)?
+2. **Auth provider:** What handles authentication? (Azure AD / Auth0 / custom JWT / session-based / none yet)
+3. **Secret storage:** Where do secrets live in this project? (Azure Key Vault / `.env` files / environment variables / not decided yet)
+4. **Microsoft stack?** Does this project use any of: SPFx, D365, Graph API, Azure Functions, Power Platform?
+
+From the answers, generate a pre-filled `SECURITY.md` using the template in `Third-Party-Tools/../SECURITY.md`. Leave sections the user didn't answer as `[TBD]`.
+
+Tell the user:
+> *"`SECURITY.md` created. All council and security skills will now read this for context. Update it after each security review — the `/security-council` skill does this automatically.*"
+
+### 6. Done
+
+Tell the user the setup is complete and which skills now read from these files. Mention they can edit `docs/agents/*.md` and `SECURITY.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
