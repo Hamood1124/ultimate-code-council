@@ -152,7 +152,7 @@ Done. The whole thing took less time than a manual PR review.
 
 ## How to install it
 
-**You need:** Claude Code installed. If you don't have it yet, ask Naveen.
+**You need:** Claude Code installed. If you don't have it yet, ask Ashraf.
 
 **Step 1 — Install Matt Pocock's engineering skills (dependency)**
 ```bash
