@@ -36,7 +36,7 @@ cat requirements.txt pyproject.toml 2>/dev/null | head -10
 cat *.csproj 2>/dev/null | head -10
 ```
 
-Use domain vocabulary from `CONTEXT.md` in every reviewer finding. "The `Customer` entity" not "the user object". If no `CONTEXT.md` exists, tell the orchestrator — do not proceed without it (the orchestrator will run `/setup-matt-pocock-skills`).
+Use domain vocabulary from `CONTEXT.md` in every reviewer finding. "The `Customer` entity" not "the user object". If no `CONTEXT.md` exists, tell the orchestrator — do not proceed without it (the orchestrator will run `/setup-ashraf-skills`).
 
 ---
 

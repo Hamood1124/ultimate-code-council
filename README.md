@@ -2,7 +2,7 @@
 
 A self-driving code quality pipeline for Claude Code. One command starts a full pipeline — from aligning on what to build, through planning, TDD, multi-reviewer code review, debugging, and shipping.
 
-Built on top of [Matt Pocock's engineering skills](https://github.com/mattpocock/skills) with a master orchestrator and six-reviewer Code Council added on top.
+Everything is in this repo. No external dependencies. No third-party installs.
 
 ---
 
@@ -11,7 +11,7 @@ Built on top of [Matt Pocock's engineering skills](https://github.com/mattpocock
 ```
 /council-start
       ↓
-  SETUP        → /setup-matt-pocock-skills  (once per repo)
+  SETUP        → /setup-ashraf-skills       (once per repo)
   ALIGN        → /grill-with-docs           (design tree interview)
   PLAN         → /to-prd + /to-issues       (PRD → vertical slice issues)
   BUILD        → /tdd                       (red-green-refactor)
@@ -27,42 +27,32 @@ The user only intervenes for real decisions. Everything else chains automaticall
 
 ## Installation
 
-### Option A — Install from this repo (recommended)
+### One command — gets everything
 
 ```bash
-npx skills@latest add Hamood1124/ultimate-code-council
+npx skills@latest add Hamood1124/ultimate-code-council -g
 ```
 
-### Option B — Manual install
+The `-g` flag installs globally so it works in every project, not just one.
 
-Clone this repo and copy the skills to your Claude Code global skills directory:
-
-```bash
-git clone https://github.com/Hamood1124/ultimate-code-council.git
-cp -r ultimate-code-council/code-council ~/.claude/skills/
-cp -r ultimate-code-council/council-start ~/.claude/skills/
-```
-
-### Install Matt Pocock's skills (required dependency)
-
-```bash
-npx skills@latest add mattpocock/skills
-```
+That's it. All skills — the Code Council, the orchestrator, and all supporting engineering skills — are bundled in this repo. Nothing else to install.
 
 ---
 
 ## Skills in this repo
+
+### Your skills (built in-house)
 
 | Skill | Description |
 |-------|-------------|
 | `/council-start` | Master orchestrator — start here |
 | `/code-council` | Six-reviewer code quality council |
 
-### Skills from Matt Pocock (installed separately)
+### Engineering skills (bundled — no separate install needed)
 
 | Skill | Used for |
 |-------|----------|
-| `/setup-matt-pocock-skills` | One-time repo setup (CONTEXT.md, issue tracker) |
+| `/setup-ashraf-skills` | One-time repo setup (CONTEXT.md, issue tracker) |
 | `/grill-with-docs` | Design alignment before building |
 | `/to-prd` | Generate PRD from conversation |
 | `/to-issues` | Break PRD into GitHub issues |
@@ -72,6 +62,8 @@ npx skills@latest add mattpocock/skills
 | `/zoom-out` | Get broader context on unfamiliar code |
 | `/prototype` | Throwaway prototype before committing |
 | `/triage` | Issue backlog management |
+| `/grill-me` | Relentless design interview |
+| `/handoff` | Pass context between agent sessions |
 
 ---
 
@@ -86,9 +78,11 @@ npx skills@latest add mattpocock/skills
 ```
 /code-council
 ```
-or
+or just say:
 ```
 ship check
+review this
+is this safe to ship
 ```
 
 ### Quick scan before pushing
@@ -101,15 +95,25 @@ quick scan
 deep review
 ```
 
+### Debug a specific bug
+```
+/diagnose
+```
+
+### Weekly architecture review
+```
+/improve-codebase-architecture
+```
+
 ---
 
 ## How it works
 
-1. `/council-start` detects where you are in the pipeline (fresh start / has PRD / has code / needs review)
-2. It ensures `CONTEXT.md` exists (your project's domain glossary) — creates it if not
+1. `/council-start` detects where you are in the pipeline — fresh start, has a PRD, has code ready to review, or needs debugging
+2. It ensures `CONTEXT.md` exists (your project's domain glossary) — creates it if not, using `/setup-ashraf-skills`
 3. It chains through the pipeline automatically, pausing only for real decisions
 4. `/code-council` runs 6 specialist reviewers, executes your test suite and type checker, and produces a SHIP / SHIP WITH FIXES / DO NOT SHIP verdict
-5. Blockers are routed to `/diagnose`. Fixes are applied directly in the repo.
+5. Blockers are routed to `/diagnose`. Fixes are applied directly in the repo — no zips, no manual copying.
 
 ---
 
@@ -123,6 +127,23 @@ deep review
 | Maintainability Critic | Naming, structure, duplication, complexity |
 | Requirements Verifier | Does it do what was asked? |
 | Integration Skeptic | Side effects, contracts, environment assumptions |
+
+---
+
+## Per-repo setup (run once per project)
+
+When you open a new project in Claude Code for the first time:
+
+```
+/setup-ashraf-skills
+```
+
+This creates:
+- `CONTEXT.md` — your project's domain glossary (all skills read this)
+- `docs/adr/` — architectural decision records
+- `docs/agents/` — issue tracker config and triage labels
+
+The orchestrator (`/council-start`) runs this automatically if it hasn't been done yet — you don't have to remember.
 
 ---
 

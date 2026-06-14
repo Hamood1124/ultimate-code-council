@@ -43,8 +43,8 @@ ls .scratch/ docs/prd/ 2>/dev/null
 
 | State | Action |
 |-------|--------|
-| No `CONTEXT.md` AND no agent skills config | → Auto-run `/setup-matt-pocock-skills` before anything else. Tell user: *"No project context found — setting up your repo first. This only happens once."* |
-| `CONTEXT.md` exists but no agent skills config | → Auto-run `/setup-matt-pocock-skills` in quick mode (issue tracker + labels only, reuse existing CONTEXT.md) |
+| No `CONTEXT.md` AND no agent skills config | → Auto-run `/setup-ashraf-skills` before anything else. Tell user: *"No project context found — setting up your repo first. This only happens once."* |
+| `CONTEXT.md` exists but no agent skills config | → Auto-run `/setup-ashraf-skills` in quick mode (issue tracker + labels only, reuse existing CONTEXT.md) |
 | Everything exists | → Skip setup, proceed to Phase 1 |
 
 After setup completes (or if already set up), read:

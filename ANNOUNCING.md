@@ -22,9 +22,9 @@ Instead of asking Claude to review your code and hoping for the best, this runs 
 Each reviewer gives you severity-ranked issues (`🔴 Blocker / 🟠 High / 🟡 Medium / 🟢 Low`) with unique IDs (`CC-001`, `CC-002`...) and a final verdict:
 
 ```
-SHIP IT ✅       — nothing blocking, you're good
+SHIP IT ✅          — nothing blocking, you're good
 SHIP WITH FIXES ⚠️  — Highs found, fix before merging
-DO NOT SHIP 🔴   — Blockers found, needs diagnosis first
+DO NOT SHIP 🔴      — Blockers found, needs diagnosis first
 ```
 
 But honestly the review is just one part of it.
@@ -71,7 +71,7 @@ Here's what an actual session looks like. You open Claude Code in your SPFx proj
 **What happens next:**
 
 **Step 1 — It checks your project first (silently)**
-Looks for `CONTEXT.md` (your project glossary), reads existing ADRs, detects it's an SPFx TypeScript project. If `CONTEXT.md` doesn't exist yet, it creates one by asking you a few questions about your project's domain terms.
+Looks for `CONTEXT.md` (your project glossary), reads existing ADRs, detects it's an SPFx TypeScript project. If `CONTEXT.md` doesn't exist yet, it runs `/setup-ashraf-skills` automatically — takes 2 minutes, happens once.
 
 **Step 2 — It interviews you**
 ```
@@ -126,7 +126,7 @@ Suggested fix: Use encodeURIComponent() or build the filter with a
 ## ✅ Performance Engineer
 No issues found at Standard depth.
 
-## ✅ Correctness Judge  
+## ✅ Correctness Judge
 No issues found at Standard depth.
 ```
 
@@ -154,26 +154,21 @@ Done. The whole thing took less time than a manual PR review.
 
 **You need:** Claude Code installed. If you don't have it yet, ask Ashraf.
 
-**Step 1 — Install Matt Pocock's engineering skills (dependency)**
-```bash
-npx skills@latest add mattpocock/skills -g
-```
-
-**Step 2 — Install the Code Council**
+**One command — gets everything:**
 ```bash
 npx skills@latest add Hamood1124/ultimate-code-council -g
 ```
 
-The `-g` flag installs globally so it works in every project, not just one.
+Everything is bundled in the repo — the Code Council, the orchestrator, and all supporting skills. Nothing else to install.
 
-**Step 3 — Set up your project (once per repo)**
+**Set up your project (once per repo):**
 
 Open Claude Code in your project and run:
 ```
-/setup-matt-pocock-skills
+/setup-ashraf-skills
 ```
 
-This creates a `CONTEXT.md` file — your project's domain glossary. Takes 2 minutes. Every skill reads this so Claude always uses your project's actual terminology.
+This creates a `CONTEXT.md` file — your project's domain glossary. Takes 2 minutes. Every skill reads this so Claude always uses your project's actual terminology instead of generic names.
 
 **That's it.** Open any project and type `/council-start` to begin.
 
