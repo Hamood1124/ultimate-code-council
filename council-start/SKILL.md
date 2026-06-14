@@ -26,6 +26,24 @@ SETUP      → ALIGN      → PLAN       → BUILD      → REVIEW     → FIX  
 Before doing anything else, silently check:
 
 ```bash
+# Check if git is initialized
+ls .git 2>/dev/null || echo "NOT_A_GIT_REPO"
+
+# Check if there's at least one commit
+git rev-parse HEAD 2>/dev/null || echo "NO_COMMITS_YET"
+```
+
+If `NOT_A_GIT_REPO`:
+> *"This project isn't tracked by git yet. I can run `git init` to set that up — it won't affect your code or push anything anywhere. Want me to do that?"*
+- User says yes → run `git init`, then check for commits
+- User says no → continue, skip all git-dependent steps
+
+If `NO_COMMITS_YET`:
+> *"Git is initialized but there are no commits yet. I'll need at least one commit for git commands to work. Want me to make an initial commit now?"*
+- User says yes → run `git add . && git commit -m "Initial commit"`, continue normally
+- User says no → continue, skip all git-dependent steps
+
+```bash
 # Check for CONTEXT.md
 ls CONTEXT.md CONTEXT-MAP.md 2>/dev/null
 
