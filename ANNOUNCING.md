@@ -31,6 +31,53 @@ But honestly the review is just one part of it.
 
 ---
 
+## Phase 2 — Security layer (just added)
+
+On top of the code review, we now have a dedicated security layer that runs automatically:
+
+### `/secrets-scan` — runs before every single ship
+Scans every file for hardcoded API keys, tokens, passwords, connection strings, and private keys. Checks your `.gitignore` covers sensitive files. Checks git history for secrets that were committed and deleted (they're still there). Works on any language or stack.
+
+```
+SS-001 — API key hardcoded in source [🔴 Blocker] [Confirmed]
+File: src/services/ApiService.ts line 12
+Found: apiKey: "sk-ab****************************"
+Fix: Move to environment variable. See SECURITY.md for approved approach.
+```
+
+### `/security-council` — deep 5-agent security review
+Five specialist agents each cover a different attack surface:
+
+| Agent | What they hunt for |
+|-------|-------------------|
+| Auth & Session | JWT flaws, OAuth misconfig, session fixation, weak passwords |
+| Secrets (contextual) | Secrets in bundles, logs, URLs, error responses |
+| Data Access | SQL/NoSQL injection, IDOR, mass assignment, path traversal |
+| API Surface | Unprotected endpoints, broken auth, missing rate limits, CORS |
+| Dependency | Known CVEs in your npm/pip/NuGet packages |
+
+Issue IDs: `SC-001`, `SC-002`... Reads your project's `SECURITY.md` to avoid false positives on known-accepted patterns.
+
+### `/msft-security` — Microsoft stack bonus layer
+Specifically for SPFx, D365, Graph API, and Azure projects. Catches things generic tools miss:
+- Graph API scope over-permission (`Files.ReadWrite.All` when `Files.Read` suffices)
+- SPFx web part properties exposing secrets to the page
+- D365 OData filter injection
+- Azure Key Vault vs hardcoded secrets
+- Azure AD app registration hygiene
+
+Issue IDs: `MS-001`, `MS-002`...
+
+### How security triggers automatically
+You don't have to remember to run these. The orchestrator handles it:
+- Before every SHIP IT → `/secrets-scan` always runs
+- Changed files touch auth/tokens/sessions → `/security-council` (Auth agent) auto-runs
+- Changed files touch API routes/controllers → `/security-council` (API agent) auto-runs
+- Changed files touch DB/queries/models → `/security-council` (Data agent) auto-runs
+- Microsoft stack detected + security files changed → `/msft-security` also runs
+
+---
+
 ## The full pipeline
 
 The real power is that it's a **self-driving pipeline**. You type one thing and it handles the rest:
@@ -44,7 +91,7 @@ You: "let's build a leave request approval workflow"
         ↓
    Builds it using TDD (test first, then code)
         ↓
-   Reviews it before handing it back
+   Reviews it before handing it back (code + security)
         ↓
    Fixes any blockers it finds
         ↓
@@ -71,7 +118,7 @@ Here's what an actual session looks like. You open Claude Code in your SPFx proj
 **What happens next:**
 
 **Step 1 — It checks your project first (silently)**
-Looks for `CONTEXT.md` (your project glossary), reads existing ADRs, detects it's an SPFx TypeScript project. If `CONTEXT.md` doesn't exist yet, it runs `/setup-ashraf-skills` automatically — takes 2 minutes, happens once.
+Looks for `CONTEXT.md` (your project glossary) and `SECURITY.md` (security baseline). If neither exists, it runs `/setup-ashraf-skills` automatically — takes 2 minutes, happens once.
 
 **Step 2 — It interviews you**
 ```
@@ -90,9 +137,9 @@ You: Direct manager first, then department head if more than 5 days
 Creates a proper requirements doc with user stories and breaks it into independently workable tasks. Posts them to your issue tracker.
 
 **Step 4 — Builds it with TDD**
-Writes one test, makes it pass, refactors, repeat. Uses your project's domain vocabulary from `CONTEXT.md` — it calls things "LeaveRequest" not "formData" because it read your glossary.
+Writes one test, makes it pass, refactors, repeat. Uses your project's domain vocabulary from `CONTEXT.md`.
 
-**Step 5 — Runs the council before handing it back**
+**Step 5 — Runs the full council**
 ```
 📋 Council Context
 ──────────────────
@@ -109,44 +156,34 @@ Tooling run:
   ✅ jest:          14 passed
 ```
 
-Then the reviewers run. Example findings:
+Code Council runs. Then because files touch OData (data access), Security Council auto-triggers. Then because Microsoft stack is detected, MSFT Security also runs:
 
 ```
-## 🔍 Security Auditor
-Issues found: 1  |  Highest severity: 🔴 Blocker
+## 🔍 Security Auditor [Code Council]
+CC-001 — OData query built with string interpolation [🔴 Blocker] [Confirmed]
 
-### CC-001 — OData query built with string interpolation [🔴 Blocker] [Confirmed]
-Location: src/services/LeaveService.ts line 34
-What's wrong: The employee ID is concatenated directly into the OData
-  filter string. If the ID comes from user input, this is an injection risk.
-Why it matters: Can be exploited to access other employees' leave records.
-Suggested fix: Use encodeURIComponent() or build the filter with a
-  parameterized helper instead of string concatenation.
+## 🛡️ Data Access Agent [Security Council]
+SC-001 — Employee ID not validated before OData filter [🔴 Blocker] [Confirmed]
 
-## ✅ Performance Engineer
-No issues found at Standard depth.
+## 🏢 D365 Check [MSFT Security]
+MS-001 — OData $select not used — returning full Employee entity [🟠 High]
 
-## ✅ Correctness Judge
-No issues found at Standard depth.
+## 🔑 Secrets Scan
+✅ No secrets found. .gitignore coverage: clean.
 ```
 
 **Step 6 — Asks if you want it fixed**
 ```
 Should I apply the fixes directly to your files?
-I'll fix: CC-001 (🔴 Blocker)
+I'll fix: CC-001, SC-001 (🔴 Blockers), MS-001 (🟠 High)
 Reply yes to apply.
 ```
 
-You say yes. It fixes the file in place, runs `tsc --noEmit` again to confirm it's clean, runs a delta review on just that file, and comes back:
+Fixes applied in place. Delta review confirms everything clean.
 
 ```
-🔁 Delta Review
-CC-001 — ✅ Resolved. No new issues introduced.
-
 Updated verdict: SHIP IT ✅
 ```
-
-Done. The whole thing took less time than a manual PR review.
 
 ---
 
@@ -159,7 +196,7 @@ Done. The whole thing took less time than a manual PR review.
 npx skills@latest add Hamood1124/ultimate-code-council -g
 ```
 
-Everything is bundled in the repo — the Code Council, the orchestrator, and all supporting skills. Nothing else to install.
+Everything is bundled — code council, security layer, orchestrator, all supporting skills. Nothing else to install.
 
 **Set up your project (once per repo):**
 
@@ -168,7 +205,7 @@ Open Claude Code in your project and run:
 /setup-ashraf-skills
 ```
 
-This creates a `CONTEXT.md` file — your project's domain glossary. Takes 2 minutes. Every skill reads this so Claude always uses your project's actual terminology instead of generic names.
+This creates `CONTEXT.md` (domain glossary) and `SECURITY.md` (security baseline). Takes 2 minutes. Every skill reads both from that point on.
 
 **That's it.** Open any project and type `/council-start` to begin.
 
@@ -182,6 +219,9 @@ This creates a `CONTEXT.md` file — your project's domain glossary. Takes 2 min
 | Review code you wrote | `ship check` or `review this` |
 | Quick scan before pushing | `quick scan` |
 | Full deep audit | `deep review` |
+| Scan for secrets/credentials | `/secrets-scan` |
+| Full security audit | `/security-council` |
+| Microsoft-stack security check | `/msft-security` |
 | Debug a specific bug | `/diagnose` |
 | Weekly architecture review | `/improve-codebase-architecture` |
 | Get broader context on unfamiliar code | `/zoom-out` |
