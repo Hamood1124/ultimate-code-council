@@ -1,6 +1,6 @@
 ---
 name: council-start
-description: Master orchestrator for the Ultimate Code Council pipeline. Single entry point that detects repo state and drives the full pipeline automatically — setup → align → plan → build → review → fix → ship. ALWAYS TRIGGER on: "let's build X", "start the council", "new feature", "I want to build", "start a new project", "help me build", "council start", "/cc". Also trigger when user starts describing something they want to create and no prior pipeline session is active. The user should never have to call individual skills manually — this orchestrator calls them in the right order automatically.
+description: "Master orchestrator for the Ultimate Code Council pipeline. Single entry point that detects repo state and drives the full pipeline automatically — setup → align → plan → build → review → fix → ship. ALWAYS TRIGGER on: "let's build X", "start the council", "new feature", "I want to build", "start a new project", "help me build", "council start", "/cc". Also trigger when user starts describing something they want to create and no prior pipeline session is active. The user should never have to call individual skills manually — this orchestrator calls them in the right order automatically."
 ---
 
 # Council Start — Master Orchestrator
