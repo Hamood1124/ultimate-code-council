@@ -253,9 +253,28 @@ Summary:
 Ready to merge.
 ```
 
-Ask: *"Want me to run `/improve-codebase-architecture` to check if this surge of development introduced any architectural debt?"*
+Then ask — **one message, user picks what they need, nothing runs without a yes:**
 
-If yes → run it. If no → done.
+```
+What would you like to do next?
+
+DOCUMENTATION
+📄 /handover-doc      — project handover for client or team
+📘 /tech-doc          — technical documentation for the codebase
+👤 /user-guide        — end user guide (non-technical)
+📝 /changelog         — changelog entry from this session
+🏛️  /adr-writer       — write an ADR for decisions made today
+🗒️  /meeting-notes    — format meeting minutes / MOM
+📊 /client-report     — weekly client status update
+
+MAINTENANCE
+🏗️  /improve-codebase-architecture  — check for architectural debt
+🔍 /diff-review                     — review changes before merging
+
+Reply with which one(s) you want, or skip to finish.
+```
+
+Wait for explicit reply. Nothing runs automatically. If user says skip or nothing → done.
 
 ---
 
