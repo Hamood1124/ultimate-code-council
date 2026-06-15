@@ -1,6 +1,6 @@
 ---
 name: code-council
-description: "Six-reviewer code quality council for Claude Code. Analyzes any code, file, or full project across correctness, security, performance, maintainability, requirements, and integration disciplines. Produces a structured markdown report with severity-ranked issues (CC-IDs), confidence scores, and a SHIP / SHIP WITH FIXES / DO NOT SHIP verdict. Fixes files directly in the repo — no zips. TRIGGER on: "council this code", "ship check", "code review", "review this", "audit this", "is this safe to ship". Auto-triggered by council-start orchestrator after TDD build phase. Auto-runs on any non-trivial code Claude generates (30+ lines or anything touching auth/data/APIs)."
+description: "Six-reviewer code quality council for Claude Code. Analyzes any code, file, or full project across correctness, security, performance, maintainability, requirements, and integration disciplines. Produces a structured markdown report with severity-ranked issues (CC-IDs), confidence scores, and a SHIP / SHIP WITH FIXES / DO NOT SHIP verdict. Fixes files directly in the repo — no zips. TRIGGER on: 'council this code', 'ship check', 'code review', 'review this', 'audit this', 'is this safe to ship'. Auto-triggered by council-start orchestrator after TDD build phase. Auto-runs on any non-trivial code Claude generates (30+ lines or anything touching auth/data/APIs)."
 ---
 
 # Code Council — Claude Code Edition
