@@ -402,20 +402,104 @@ Two documents generated. Done.
 
 ## How to install
 
-**One command:**
+There are two ways to use the Ultimate Code Council depending on how you access Claude.
+
+---
+
+### Option A — Claude Code (VS Code / Terminal) — Full power
+
+This gives you the complete 32-skill pipeline with file editing, git integration, tooling runner, and everything else.
+
+**Step 1 — Install Claude Code**
+
+If you don't have it yet, ask Ashraf. You need it installed either as a VS Code extension or as a terminal tool.
+
+**Step 2 — Install all skills (one command)**
+
 ```bash
-npx skills@latest add Hamood1124/ultimate-code-council -g
+npx skills@latest add Hamood1124/ultimate-code-council -g --full-depth
 ```
 
-**Per-project setup (once):**
+The `-g` flag installs globally so it works in every project. The `--full-depth` flag is required — without it the installer only finds 2 skills instead of all 32.
+
+**Step 3 — Set up your project (once per project)**
+
+Open Claude Code inside your project folder and run:
 ```
 /setup-ashraf-skills
 ```
 
-**Update after new releases:**
+This creates `CONTEXT.md` (domain glossary) and `SECURITY.md` (security baseline). Takes 2 minutes. Only needs to happen once per project.
+
+**Step 4 — Start using it**
+```
+/council-start let's build X
+```
+
+**Update when new skills are released:**
 ```bash
 npx skills@latest add Hamood1124/ultimate-code-council -g --full-depth
 ```
+
+---
+
+### Option B — Claude.ai Web (claude.ai) — Lightweight version
+
+If you use Claude on the web browser without Claude Code installed, you can still use many of the skills manually. You won't have file system access or git integration, but the document and analysis skills work perfectly.
+
+**Step 1 — Go to the GitHub repo**
+```
+https://github.com/Hamood1124/ultimate-code-council
+```
+
+**Step 2 — Find the skill you want**
+
+Navigate to the skill folder (e.g. `Documentation/docs/meeting-notes/`) and click `SKILL.md`.
+
+**Step 3 — Download the raw file**
+
+Click the **Raw** button at the top right of the file, then save it to your computer (`Ctrl+S` / `Cmd+S`).
+
+**Step 4 — Upload to Claude.ai**
+
+Go to [claude.ai](https://claude.ai) → **Settings** → **Skills** → Upload the `.md` file you downloaded.
+
+**Step 5 — Use it**
+
+Start a new chat and the skill will be available. Trigger it by name, e.g. `/meeting-notes` or just describe what you want.
+
+---
+
+### Which skills work where?
+
+Not all skills can run on the web — some need file system access, git, or a terminal. Here's the full breakdown:
+
+| Skill | Claude Code ✅ | Web (claude.ai) |
+|-------|--------------|----------------|
+| `/council-start` | ✅ Full pipeline | ❌ Needs filesystem + git |
+| `/code-council` | ✅ Full — runs tooling, fixes files | ⚠️ Paste code manually, no auto-fixes |
+| `/diff-review` | ✅ Full — reads git diff | ❌ Needs git |
+| `/secrets-scan` | ✅ Full — scans all files + git history | ⚠️ Paste code manually, no history scan |
+| `/security-council` | ✅ Full — scans filesystem | ⚠️ Paste code manually |
+| `/msft-security` | ✅ Full — scans filesystem | ⚠️ Paste code manually |
+| `/tdd` | ✅ Full — writes + runs tests | ❌ Needs filesystem |
+| `/refactor` | ✅ Full — edits files, runs tests | ❌ Needs filesystem + tests |
+| `/env-setup` | ✅ Full — checks your environment | ❌ Needs terminal |
+| `/test-writer` | ✅ Full — writes test files | ❌ Needs filesystem |
+| `/diagnose` | ✅ Full — runs feedback loop | ❌ Needs terminal |
+| `/estimate` | ✅ Full | ✅ Works great on web |
+| `/code-explain` | ✅ Full | ✅ Works great — paste code |
+| `/meeting-notes` | ✅ Full | ✅ Works great on web |
+| `/sow` | ✅ Full | ✅ Works great on web |
+| `/handover-doc` | ✅ Full — reads project files | ✅ Works — paste context manually |
+| `/tech-doc` | ✅ Full — reads actual code | ✅ Works — paste code manually |
+| `/user-guide` | ✅ Full | ✅ Works great on web |
+| `/changelog` | ✅ Full — reads git + issue IDs | ⚠️ Works — paste changes manually |
+| `/adr-writer` | ✅ Full | ✅ Works great on web |
+| `/client-report` | ✅ Full — reads git history | ✅ Works — describe work manually |
+| `/onboarding` | ✅ Full — reads project | ✅ Works — paste context manually |
+
+**Web recommendation:** For web users, the most useful skills to download are `/meeting-notes`, `/sow`, `/estimate`, `/user-guide`, `/adr-writer`, `/client-report`, and `/code-explain`. These work fully without needing any local setup.
 
 ---
 
