@@ -5,6 +5,31 @@ description: "Generates an end-user guide for non-technical users of the system.
 
 # User Guide
 
+---
+
+## Phase 0 — Tooling check (silently, before anything else)
+
+```bash
+# Check if Node.js is available
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# Check if docx library is installed globally
+node -e "require('docx')" 2>/dev/null || echo "DOCX_NOT_INSTALLED"
+```
+
+If `NODE_NOT_FOUND`:
+> *"Node.js is required to generate Word documents. Install it from nodejs.org, then try again. In the meantime, I can deliver this as Markdown."*
+→ Default to Markdown, continue.
+
+If `DOCX_NOT_INSTALLED`:
+> *"Installing the docx library — this only happens once."*
+```bash
+npm install -g docx
+```
+Then confirm installation succeeded before continuing. If install fails, default to Markdown and note it.
+
+> Note: PDF output is not supported in Claude Code. For PDFs, use the web version at claude.ai instead.
+
 Generates plain-English documentation for the actual users of the system — not developers. No technical jargon, no code snippets. Written for people who just need to know how to use the thing.
 
 ---
@@ -25,20 +50,23 @@ find . -not -path '*/node_modules/*' \
 
 ---
 
-## Phase 1 — Scope the request
+## Phase 1 — Format + scope (ask before writing anything)
 
-Ask in one message:
+Ask in one message — do not generate any content until this is answered:
 
 ```
-I'll write the user guide. A few quick questions:
+Before I write anything, two quick questions:
 
-1. What's the name of the system/app? (what do users call it)
-2. Who are the users? (e.g. HR managers, employees, finance team)
-3. Do you want the full guide or specific features only?
-4. Any known pain points or things users find confusing?
+1. What format do you want the output in?
+   - Markdown (.md) — stays in chat or saved as a file
+   - Word document (.docx) — downloadable, client-friendly
+
+2. Do you want the full guide or specific features only?
+   Also: who are the users? (e.g. HR managers, employees, finance team)
+   Any known pain points or things users find confusing?
 ```
 
-Wait for answers before writing anything.
+Wait for answers. Do not write a single line of the guide until format is confirmed.
 
 ---
 
@@ -80,6 +108,8 @@ Who to contact, how to raise a support request
 
 ## Phase 3 — Deliver
 
-Deliver as `USER-GUIDE.md` or `.docx`.
+Deliver in the format the user confirmed in Phase 1:
+- Markdown → deliver as `USER-GUIDE.md` in the project root or in chat
+- Word → generate `.docx` file
 
 > *"User guide complete. Recommend having a non-technical team member read through it before sharing — they'll catch any jargon that slipped through."*

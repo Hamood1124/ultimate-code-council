@@ -5,6 +5,31 @@ description: "Writes a proper Architectural Decision Record (ADR) when a signifi
 
 # ADR Writer
 
+---
+
+## Phase 0 — Tooling check (silently, before anything else)
+
+```bash
+# Check if Node.js is available
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# Check if docx library is installed globally
+node -e "require('docx')" 2>/dev/null || echo "DOCX_NOT_INSTALLED"
+```
+
+If `NODE_NOT_FOUND`:
+> *"Node.js is required to generate Word documents. Install it from nodejs.org, then try again. In the meantime, I can deliver this as Markdown."*
+→ Default to Markdown, continue.
+
+If `DOCX_NOT_INSTALLED`:
+> *"Installing the docx library — this only happens once."*
+```bash
+npm install -g docx
+```
+Then confirm installation succeeded before continuing. If install fails, default to Markdown and note it.
+
+> Note: PDF output is not supported in Claude Code. For PDFs, use the web version at claude.ai instead.
+
 Writes a proper Architectural Decision Record when a significant technical decision is made. ADRs are permanent records — they explain not just what was decided but why, so future developers don't re-litigate closed decisions.
 
 ---
@@ -24,16 +49,20 @@ ls docs/adr/ADR-*.md 2>/dev/null | wc -l
 
 ## Phase 1 — Capture the decision
 
-Ask in one message:
+Ask in one message — do not write the ADR until answered:
 
 ```
-I'll write the ADR. Tell me:
+I'll write the ADR. A few things first:
 
-1. What was decided? (one sentence — the actual decision)
-2. What problem were you solving? (why was a decision needed)
-3. What alternatives did you consider? (even briefly)
-4. What are the downsides or trade-offs of what you chose?
-5. Is this decision reversible or hard to undo?
+1. What format do you want?
+   - Markdown (.md) — saved to docs/adr/ in the project
+   - Word document (.docx) — downloadable
+
+2. What was decided? (one sentence — the actual decision)
+3. What problem were you solving? (why was a decision needed)
+4. What alternatives did you consider? (even briefly)
+5. What are the downsides or trade-offs of what you chose?
+6. Is this decision reversible or hard to undo?
 ```
 
 Wait for answers. If the user already described the decision in the conversation above, extract from context and confirm instead of asking from scratch.
@@ -99,8 +128,8 @@ What constraints existed. What was at stake.]
 
 ## Phase 3 — Save
 
-Save as `docs/adr/ADR-[NNN]-[slug].md` where NNN is the next number in sequence.
-
-Create `docs/adr/` if it doesn't exist.
+Deliver in the format confirmed in Phase 1:
+- Markdown → save as `docs/adr/ADR-[NNN]-[slug].md` (create `docs/adr/` if it doesn't exist)
+- Word → generate `.docx` file
 
 > *"ADR-[NNN] saved. This decision is now part of the project's permanent record. The Security Council and Integration Skeptic will reference it in future reviews."*

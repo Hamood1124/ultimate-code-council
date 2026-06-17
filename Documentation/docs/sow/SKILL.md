@@ -5,6 +5,31 @@ description: "Generates a professional Statement of Work (SOW) or technical prop
 
 # Statement of Work
 
+---
+
+## Phase 0 — Tooling check (silently, before anything else)
+
+```bash
+# Check if Node.js is available
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# Check if docx library is installed globally
+node -e "require('docx')" 2>/dev/null || echo "DOCX_NOT_INSTALLED"
+```
+
+If `NODE_NOT_FOUND`:
+> *"Node.js is required to generate Word documents. Install it from nodejs.org, then try again. In the meantime, I can deliver this as Markdown."*
+→ Default to Markdown, continue.
+
+If `DOCX_NOT_INSTALLED`:
+> *"Installing the docx library — this only happens once."*
+```bash
+npm install -g docx
+```
+Then confirm installation succeeded before continuing. If install fails, default to Markdown and note it.
+
+> Note: PDF output is not supported in Claude Code. For PDFs, use the web version at claude.ai instead.
+
 Generates a professional SOW or technical proposal from a client requirement. Pre-project skill — this runs before `/council-start`, not after. Reads ACME-specific templates from `templates/` if they exist.
 
 ---
@@ -24,41 +49,47 @@ cat CONTEXT.md 2>/dev/null
 
 ## Phase 1 — Structured interview
 
-Ask all questions in one message — don't trickle them:
+Ask all questions in one message — don't trickle them. **Include format as question 1:**
 
 ```
 I'll write the SOW. Tell me what you know — answer what you can, skip what you don't:
 
+FORMAT
+1. What format do you want the final output in?
+   - Word document (.docx) — recommended for client-facing SOWs
+   - Markdown (.md) — internal reference
+   - Both .docx and .md
+
 CLIENT
-1. Client name and contact person
-2. Industry / what they do (briefly)
+2. Client name and contact person
+3. Industry / what they do (briefly)
 
 PROJECT
-3. What does the client want built or implemented?
-4. What problem are they trying to solve?
-5. Any existing systems involved? (D365, SharePoint, etc.)
-6. Any specific technology requirements or constraints?
+4. What does the client want built or implemented?
+5. What problem are they trying to solve?
+6. Any existing systems involved? (D365, SharePoint, etc.)
+7. Any specific technology requirements or constraints?
 
 SCOPE
-7. What's explicitly IN scope?
-8. What's explicitly OUT of scope? (critical — protect ACME)
-9. Any phasing? (Phase 1 now, Phase 2 later?)
+8. What's explicitly IN scope?
+9. What's explicitly OUT of scope? (critical — protect ACME)
+10. Any phasing? (Phase 1 now, Phase 2 later?)
 
 DELIVERY
-10. Expected timeline or deadline?
-11. Any milestones the client has mentioned?
-12. What does "done" look like to the client?
+11. Expected timeline or deadline?
+12. Any milestones the client has mentioned?
+13. What does "done" look like to the client?
 
 COMMERCIAL
-13. Rough budget or pricing model? (fixed price / T&M / retainer)
+14. Rough budget or pricing model? (fixed price / T&M / retainer)
     (Leave blank if not decided — I'll leave a placeholder)
 
 ASSUMPTIONS & DEPENDENCIES
-14. What do you need from the client to start? (access, data, decisions)
-15. Any assumptions you're making that could affect scope?
+15. What do you need from the client to start? (access, data, decisions)
+16. Any assumptions you're making that could affect scope?
 ```
 
-Wait for answers. The more detail provided, the less the user needs to review afterward.
+Wait for answers. Do not generate any content until format is confirmed.
 
 ---
 
@@ -210,11 +241,9 @@ Enough detail to demonstrate competence without over-committing.]
 
 ## Phase 3 — Deliver
 
-Ask: *"Deliver as Word document (.docx) or markdown?"*
-
-SOWs going to clients → always `.docx`
-Internal reference → markdown is fine
-
-Suggested filename: `SOW-[ClientName]-[ProjectName]-[Date].docx`
+Deliver in the format confirmed in Phase 1:
+- Word (.docx) → generate `.docx` file — recommended for client-facing SOWs
+- Markdown → deliver as `SOW-[ClientName]-[ProjectName]-[Date].md`
+- Both → generate both
 
 > *"SOW complete. Before sending to the client, review Section 3.2 (Out of Scope) and Section 7 (Assumptions) carefully — these are your protection if scope creep happens. Also fill in the commercial terms placeholder in Section 9."*

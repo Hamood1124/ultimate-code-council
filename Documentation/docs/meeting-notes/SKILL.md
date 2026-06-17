@@ -5,6 +5,31 @@ description: "Formats meeting minutes / Minutes of Meeting (MOM) from a descript
 
 # Meeting Notes
 
+---
+
+## Phase 0 — Tooling check (silently, before anything else)
+
+```bash
+# Check if Node.js is available
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# Check if docx library is installed globally
+node -e "require('docx')" 2>/dev/null || echo "DOCX_NOT_INSTALLED"
+```
+
+If `NODE_NOT_FOUND`:
+> *"Node.js is required to generate Word documents. Install it from nodejs.org, then try again. In the meantime, I can deliver this as Markdown."*
+→ Default to Markdown, continue.
+
+If `DOCX_NOT_INSTALLED`:
+> *"Installing the docx library — this only happens once."*
+```bash
+npm install -g docx
+```
+Then confirm installation succeeded before continuing. If install fails, default to Markdown and note it.
+
+> Note: PDF output is not supported in Claude Code. For PDFs, use the web version at claude.ai instead.
+
 Turns rough meeting notes, bullet points, or a verbal description into a clean, structured Minutes of Meeting document. Fast — minimal questions, maximum output from whatever the user provides.
 
 ---
@@ -19,16 +44,22 @@ If no notes provided → go to Phase 1.
 
 ## Phase 1 — Gather input (only if nothing provided)
 
-Ask in one message:
+Ask in one message — do not generate anything until format is confirmed:
 
 ```
-Paste your meeting notes below — rough bullets, voice memo transcript,
-whatever you have. Also tell me:
+Before I format the notes, quick questions:
 
-- Meeting title / subject
-- Date and time
-- Who attended (names and roles)
-- Any action items you remember (even if they're in the notes too)
+1. What format do you want the output in?
+   - Markdown (.md) — in chat or saved as a file
+   - Word document (.docx) — downloadable, easy to share
+   - Both .docx and .md
+
+2. Paste your meeting notes below — rough bullets, voice memo transcript,
+   whatever you have. Also tell me:
+   - Meeting title / subject
+   - Date and time
+   - Who attended (names and roles)
+   - Any action items you remember (even if they're in the notes too)
 
 The rougher the better — I'll clean it up.
 ```
@@ -105,8 +136,9 @@ The rougher the better — I'll clean it up.
 
 ## Phase 3 — Deliver
 
-Ask: *"Deliver as markdown, Word doc (.docx), or both?"*
-
-Suggested filename: `MOM-[YYYY-MM-DD]-[subject-slug].md`
+Deliver in the format confirmed in Phase 1:
+- Markdown → deliver in chat or as `MOM-[YYYY-MM-DD]-[subject-slug].md`
+- Word → generate `.docx` file with suggested filename: `MOM-[YYYY-MM-DD]-[subject-slug].docx`
+- Both → generate both `.docx` and `.md`
 
 > *"MOM complete. Check the Action Items table — owners and due dates are the most important part to verify before sharing."*

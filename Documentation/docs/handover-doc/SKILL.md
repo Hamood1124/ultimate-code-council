@@ -9,6 +9,31 @@ Generates a complete project handover document. Reads everything already in the 
 
 ---
 
+## Phase 0 — Tooling check (silently, before anything else)
+
+```bash
+# Check if Node.js is available
+node --version 2>/dev/null || echo "NODE_NOT_FOUND"
+
+# Check if docx library is installed globally
+node -e "require('docx')" 2>/dev/null || echo "DOCX_NOT_INSTALLED"
+```
+
+If `NODE_NOT_FOUND`:
+> *"Node.js is required to generate Word documents. Install it from nodejs.org, then try again. In the meantime, I can deliver this as Markdown."*
+→ Default to Markdown, continue.
+
+If `DOCX_NOT_INSTALLED`:
+> *"Installing the docx library — this only happens once."*
+```bash
+npm install -g docx
+```
+Then confirm installation succeeded before continuing. If install fails, default to Markdown and note it.
+
+> Note: PDF output is not supported in Claude Code. For PDFs, use the web version at claude.ai instead.
+
+---
+
 ## Phase 0 — Load context (silently, before asking anything)
 
 ```bash
@@ -22,23 +47,25 @@ git log --oneline -20 2>/dev/null
 
 ---
 
-## Phase 1 — Ask only what's missing (max 5 questions)
+## Phase 1 — Format + missing context (ask before writing anything)
 
-Based on what was loaded, ask only what can't be inferred. One message, all questions at once:
+Based on what was loaded, ask only what can't be inferred. One message, all questions at once — do not generate any content until answered:
 
 ```
-I've read the project context. Before writing the handover, I need a few things:
+Before I write anything:
 
-1. Who is this handover for? (client / new team member / internal archive)
-2. What's the project status? (complete / ongoing / paused)
-3. Are there any known open issues or risks to flag?
-4. Who are the key contacts? (client contact, project lead, support)
-5. Where do credentials/secrets live? (don't share the values — just the location)
+1. What format do you want the output in?
+   - Markdown (.md) — stays in project root, zero dependencies
+   - Word document (.docx) — client-friendly, downloadable
 
-Answer what you can, skip what's not applicable.
+2. Who is this handover for? (client / new team member / internal archive)
+3. What's the project status? (complete / ongoing / paused)
+4. Any known open issues or risks to flag?
+5. Who are the key contacts? (client contact, project lead, support)
+6. Where do credentials/secrets live? (don't share the values — just the location)
 ```
 
-Wait for answers. Do not generate anything until answered.
+Wait for answers. Do not write a single line of the document until format is confirmed.
 
 ---
 
@@ -91,10 +118,9 @@ Generate and confirm each section before moving to the next:
 
 ## Phase 3 — Deliver
 
-Ask: *"Deliver as markdown file or Word document (.docx)?"*
-
+Deliver in the format confirmed in Phase 1:
 - Markdown → deliver as `HANDOVER.md` in project root
-- Word → generate `.docx` file
+- Word → generate `.docx` file using the docx library
 
 Always end with:
 > *"Handover doc complete. Review Section 4 (deployment) and Section 6 (contacts) carefully before sharing — these often need manual updates."*
