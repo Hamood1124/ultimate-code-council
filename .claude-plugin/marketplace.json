@@ -1,0 +1,47 @@
+{
+  "metadata": {
+    "name": "Ultimate Code Council",
+    "description": "Self-driving code quality, security, and documentation pipeline for Claude Code",
+    "author": "Hamood1124",
+    "repository": "https://github.com/Hamood1124/ultimate-code-council"
+  },
+  "plugins": [
+    { "name": "council-start",    "source": "council-start" },
+    { "name": "code-council",     "source": "code-council" },
+
+    { "name": "secrets-scan",     "source": "Security/secrets-scan" },
+    { "name": "security-council", "source": "Security/security-council" },
+    { "name": "msft-security",    "source": "Security/msft-security" },
+
+    { "name": "handover-doc",     "source": "Documentation/docs/handover-doc" },
+    { "name": "tech-doc",         "source": "Documentation/docs/tech-doc" },
+    { "name": "user-guide",       "source": "Documentation/docs/user-guide" },
+    { "name": "changelog",        "source": "Documentation/docs/changelog" },
+    { "name": "adr-writer",       "source": "Documentation/docs/adr-writer" },
+    { "name": "meeting-notes",    "source": "Documentation/docs/meeting-notes" },
+    { "name": "sow",              "source": "Documentation/docs/sow" },
+
+    { "name": "estimate",         "source": "Documentation/dev-tools/estimate" },
+    { "name": "code-explain",     "source": "Documentation/dev-tools/code-explain" },
+    { "name": "diff-review",      "source": "Documentation/dev-tools/diff-review" },
+    { "name": "test-writer",      "source": "Documentation/dev-tools/test-writer" },
+    { "name": "refactor",         "source": "Documentation/dev-tools/refactor" },
+    { "name": "env-setup",        "source": "Documentation/dev-tools/env-setup" },
+
+    { "name": "onboarding",       "source": "Documentation/client/onboarding" },
+    { "name": "client-report",    "source": "Documentation/client/client-report" },
+
+    { "name": "setup-ashraf-skills",           "source": "Third-Party-Tools/Engineering/setup-ashraf-skills" },
+    { "name": "grill-with-docs",               "source": "Third-Party-Tools/Engineering/grill-with-docs" },
+    { "name": "tdd",                           "source": "Third-Party-Tools/Engineering/tdd" },
+    { "name": "diagnose",                      "source": "Third-Party-Tools/Engineering/diagnose" },
+    { "name": "to-prd",                        "source": "Third-Party-Tools/Engineering/to-prd" },
+    { "name": "to-issues",                     "source": "Third-Party-Tools/Engineering/to-issues" },
+    { "name": "improve-codebase-architecture", "source": "Third-Party-Tools/Engineering/improve-codebase-architecture" },
+    { "name": "zoom-out",                      "source": "Third-Party-Tools/Engineering/zoom-out" },
+    { "name": "prototype",                     "source": "Third-Party-Tools/Engineering/prototype" },
+    { "name": "triage",                        "source": "Third-Party-Tools/Engineering/triage" },
+    { "name": "grill-me",                      "source": "Third-Party-Tools/Productivity/grill-me" },
+    { "name": "handoff",                       "source": "Third-Party-Tools/Productivity/handoff" }
+  ]
+}
