@@ -9,7 +9,7 @@ Everything is in this repo. No external dependencies. No third-party installs.
 ## Installation
 
 ```bash
-npx skills@latest add Hamood1124/ultimate-code-council -g
+npx skills@latest add Hamood1124/ultimate-code-council -g --full-depth
 ```
 
 One command. Gets everything. Global install — works in every project.

@@ -414,7 +414,7 @@ npx skills@latest add Hamood1124/ultimate-code-council -g
 
 **Update after new releases:**
 ```bash
-npx skills@latest add Hamood1124/ultimate-code-council -g
+npx skills@latest add Hamood1124/ultimate-code-council -g --full-depth
 ```
 
 ---
